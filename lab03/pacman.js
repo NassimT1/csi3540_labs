@@ -56,6 +56,7 @@ function moveLeft() {
         console.log(game);
     }
     console.log(`Score: ${score}`);
+    enemyMove()
 }
 
 function moveRight() {
@@ -73,7 +74,6 @@ function moveRight() {
             score += 10;
         }
         game[pacmanPosition] = 'C'; // Place pacman at the new position
-        console.log(game);
     } else { // Otherwise update pacman's position
         if (game[pacmanPosition + 1] === '@') {
             score += 50;
@@ -83,8 +83,30 @@ function moveRight() {
         game[pacmanPosition] = '.';
         pacmanPosition++;
         game[pacmanPosition] = 'C';
-        console.log(game);
+        
     }
+    console.log(game);
     console.log(`Score: ${score}`);
+    enemyMove()
 }
+
+function enemyMove() {
+    game[enemyPosition] = '.'; // Clear the current position of the enemy
+    let direction = Math.round(Math.random()) * 2 - 1; // Generate 0 or 1. If 0, enemy moves left (-1), if 1, enemy moves right (+1)
+    let newPosition = (enemyPosition + direction + game.length) % game.length; // Calculate the new position of the enemy
+    // Check if the new position is occupied by a fruit or the player
+    while (game[newPosition] === '@' || game[newPosition] === 'C') {
+        if (game[newPosition] === 'C') { // If the enemy collides with the player, end the game
+            console.log("Game Over");
+            console.log(`Final score: ${score}`);
+            return;
+        }
+        direction = Math.round(Math.random()) * 2 - 1; // If the new position is occupied by a fruit, generate a new direction
+        newPosition = (enemyPosition + direction + game.length) % game.length; // And calculate a new position
+    }
+    enemyPosition = newPosition;
+    game[enemyPosition] = '^'; // Place the enemy at the new position
+    console.log(game);
+}
+
 
