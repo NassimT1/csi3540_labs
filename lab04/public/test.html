@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="/assets/dice.js"></script>
+    <script src="/assets/yatzy_engine.js"></script>
+    <script src="/assets/yatzy_game.js"></script>
+</head>
+<body>
+    <button onclick="rollDice()">Roll Dice</button>
+    <div id="dice"></div>
+
+    <script>
+        function rollDice() {
+            document.getElementById('dice').innerHTML = '';
+            for (let i = 0; i < 6; i++) {
+                let dieRoll = rollDie();
+                let die = document.createElement('div');
+                die.textContent = dieRoll;
+                document.getElementById('dice').appendChild(die);
+            }
+        }
+    </script>
+</body>
+</html>
