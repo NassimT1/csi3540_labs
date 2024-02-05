@@ -1,0 +1,33 @@
+/* Reference: https://dcode.domenade.com/tutorials/how-to-create-a-dice-roll-game-with-html-css-and-javascript */
+
+.dice-container {
+    display: flex;
+}
+
+.roll-button {
+    margin-top: 10px;
+    font-size: 1.5rem;
+}
+
+.dice {
+    width: 150px;
+    height: 150px;
+    margin: 5px;
+    position: relative;
+    border-radius: 25px;
+    border: solid 0.5px;
+}
+
+.dice-dot {
+    --top: 0%;
+	--left: 0%;
+
+	width: 30px;
+	height: 30px;
+	background-color: #000000;
+	border-radius: 50%;
+	position: absolute;
+	top: var(--top);
+	left: var(--left);
+	transform: translateX(calc(var(--left) * -1)) translateY(calc(var(--top) * -1));
+}
