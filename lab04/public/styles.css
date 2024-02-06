@@ -15,19 +15,23 @@
     margin: 5px;
     position: relative;
     border-radius: 25px;
-    border: solid 0.5px;
+    border: solid 0.5px black;
+}
+
+.dice.selected {
+    border-color: red;
 }
 
 .dice-dot {
     --top: 0%;
-	--left: 0%;
+    --left: 0%;
 
-	width: 30px;
-	height: 30px;
-	background-color: #000000;
-	border-radius: 50%;
-	position: absolute;
-	top: var(--top);
-	left: var(--left);
-	transform: translateX(calc(var(--left) * -1)) translateY(calc(var(--top) * -1));
+    width: 30px;
+    height: 30px;
+    background-color: #000000;
+    border-radius: 50%;
+    position: absolute;
+    top: var(--top);
+    left: var(--left);
+    transform: translateX(calc(var(--left) * -1)) translateY(calc(var(--top) * -1));
 }
