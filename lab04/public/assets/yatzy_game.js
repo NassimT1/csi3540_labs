@@ -2,7 +2,8 @@ document.addEventListener('DOMContentLoaded', function() {
     let gameState = {
         rollCount: 0,
         diceValues: [1, 1, 1, 1, 1], // Initialize with a default value for each die
-        keep: [false, false, false, false, false]
+        keep: [false, false, false, false, false],
+        currentRound: 1
     };
 
     function rollAllDice() {
@@ -43,8 +44,22 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 diceElements[index].classList.remove('selected');
             }
-    });
+        });
+    }
 
+    function nextRound() {
+        if (gameState.currentRound < 30) {
+            gameState.currentRound++;
+            gameState.rollCount = 0;
+            gameState.diceValues = [1, 1, 1, 1, 1];
+            gameState.keep = [false, false, false, false, false];
+            document.getElementById('roll-dice').disabled = false; // Re-enable the roll button
+            updateGameDisplay();
+            console.log("Round ", gameState.currentRound);
+        } else {
+            console.log("Game over. Maximum rounds reached.");
+            document.getElementById('next-round').disabled = true; // Disable the next round button
+        }
     }
 
     document.getElementById('dice-container').addEventListener('click', function(event) {
@@ -55,7 +70,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    console.log("Round ", gameState.currentRound);
     document.getElementById('roll-dice').addEventListener('click', rollAllDice);
+    document.getElementById('next-round').addEventListener('click', nextRound); // Add event listener for the next round button
 
     updateGameDisplay(); // Initial display
     

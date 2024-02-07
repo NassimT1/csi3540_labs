@@ -4,7 +4,7 @@
     display: flex;
 }
 
-.roll-button {
+.roll-button, .next-round-button {
     margin-top: 10px;
     font-size: 1.5rem;
 }
@@ -15,7 +15,7 @@
     margin: 5px;
     position: relative;
     border-radius: 25px;
-    border: solid 0.5px black;
+    border: solid 2px black;
 }
 
 .dice.selected {
@@ -35,3 +35,25 @@
     left: var(--left);
     transform: translateX(calc(var(--left) * -1)) translateY(calc(var(--top) * -1));
 }
+
+.score-sheet {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 0px;
+    text-align: center;
+    margin-bottom: 20px;
+    border: 1px solid black;
+}
+
+.grid div {
+    border: 1px solid black;
+    padding: 20px;
+}
+
