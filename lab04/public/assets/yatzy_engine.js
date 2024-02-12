@@ -7,47 +7,40 @@ function countDice(diceValues) {
 
 function scoreOfAKind(diceValues, kind) {
     var counts = countDice(diceValues);
-    var keys = Object.keys(counts).filter(function(key) {
-        return counts[key] >= kind;
-    });
-    if (keys.length > 0) {
-        return diceValues.reduce(function(acc, cur) {
-            return acc + cur;
-        }, 0); // Sum all dice for 3/4 of a kind
+    for (var num in counts) {
+        if (counts[num] >= kind) {
+            return diceValues.reduce(function(acc, cur) {
+                return acc + cur;
+            }, 0);
+        }
     }
     return 0;
 }
 
 function scoreFullHouse(diceValues) {
     var counts = countDice(diceValues);
-    var values = Object.values(counts);
-    if (values.includes(3) && values.includes(2)) {
-        return 25; // Standard score for a full house
+    var hasThree = false;
+    var hasTwo = false;
+    for (var num in counts) {
+        if (counts[num] === 3) hasThree = true;
+        if (counts[num] === 2) hasTwo = true;
     }
-    return 0;
+    return hasThree && hasTwo ? 25 : 0;
 }
 
 function scoreSmallStraight(diceValues) {
-    var uniqueValues = [...new Set(diceValues)].sort(function(a, b) { return a - b; });
-    var straights = [[1, 2, 3, 4], [2, 3, 4, 5], [3, 4, 5, 6]];
-    for (var i = 0; i < straights.length; i++) {
-        var straight = straights[i];
-        var matches = straight.every(function(num) {
-            return uniqueValues.includes(num);
-        });
-        if (matches) {
-            return 30; // Score for a small straight
-        }
-    }
-    return 0;
+    var uniqueValues = Array.from(new Set(diceValues)).sort();
+    var straights = [
+        [1, 2, 3, 4],
+        [2, 3, 4, 5],
+        [3, 4, 5, 6]
+    ];
+    return straights.some(straight => straight.every(num => uniqueValues.includes(num))) ? 30 : 0;
 }
 
 function scoreLargeStraight(diceValues) {
-    var uniqueValues = [...new Set(diceValues)].sort().join('');
-    if (uniqueValues === '12345' || uniqueValues === '23456') {
-        return 40; // Score for a large straight
-    }
-    return 0;
+    var uniqueValues = Array.from(new Set(diceValues)).sort().join('');
+    return uniqueValues === '12345' || uniqueValues === '23456' ? 40 : 0;
 }
 
 function scoreChance(diceValues) {
@@ -57,95 +50,149 @@ function scoreChance(diceValues) {
 }
 
 function scoreYatzy(diceValues) {
-    if (new Set(diceValues).size === 1) {
-        return 50; // Score for Yatzy
-    }
-    return 0;
+    return new Set(diceValues).size === 1 ? 50 : 0;
 }
 
 function scoreUpperSection(diceValues, number) {
     return diceValues.filter(value => value === number).length * number;
 }
 
-
 function updateScoresAfterRoll() {
     const diceValues = gameState.diceValues;
-    document.getElementById('ones-value').textContent = scoreUpperSection(diceValues, 1);
-    document.getElementById('twos-value').textContent = scoreUpperSection(diceValues, 2);
-    document.getElementById('threes-value').textContent = scoreUpperSection(diceValues, 3);
-    document.getElementById('fours-value').textContent = scoreUpperSection(diceValues, 4);
-    document.getElementById('fives-value').textContent = scoreUpperSection(diceValues, 5);
-    document.getElementById('sixes-value').textContent = scoreUpperSection(diceValues, 6);
-    // Continue for all upper section scores
-    
-    // Lower section scores
-    document.getElementById('three-kind-value').textContent = scoreOfAKind(diceValues, 3);
-    document.getElementById('four-kind-value').textContent = scoreOfAKind(diceValues, 4);
-    document.getElementById('full-house-value').textContent = scoreFullHouse(diceValues);
-    document.getElementById('small-straight-value').textContent = scoreSmallStraight(diceValues);
-    document.getElementById('large-straight-value').textContent = scoreLargeStraight(diceValues);
-    document.getElementById('chance-value').textContent = scoreChance(diceValues);
-    document.getElementById('yatzy-value').textContent = scoreYatzy(diceValues);
-    
-    // Highlight potential scores
-    document.querySelectorAll('.grid div[id$="-value"]').forEach(function(element) {
-        if (element.textContent !== "0") {
-            element.classList.add('score-possible');
-        }
-    });
-}
 
-function setupScoreSelection() {
-    document.querySelectorAll('.grid div[id$="-value"]').forEach(function(element) {
-        element.addEventListener('click', function() {
-            var scoreId = this.id; // Use the full ID, including "-value"
-            confirmScore(scoreId, parseInt(this.textContent, 10));
-        });
+    if (!gameState.gameStarted || gameState.rollCount === 0) {
+        // Do not calculate or update scores before the first roll
+        return;
+    }
+
+    ['ones', 'twos', 'threes', 'fours', 'fives', 'sixes'].forEach((category, index) => {
+        updateSingleScore(category, scoreUpperSection(diceValues, index + 1));
     });
+
+    // Updating specialized scores
+    updateSingleScore('three-kind', scoreOfAKind(diceValues, 3));
+    updateSingleScore('four-kind', scoreOfAKind(diceValues, 4));
+    updateSingleScore('full-house', scoreFullHouse(diceValues));
+    updateSingleScore('small-straight', scoreSmallStraight(diceValues));
+    updateSingleScore('large-straight', scoreLargeStraight(diceValues));
+    updateSingleScore('chance', scoreChance(diceValues));
+    updateSingleScore('yatzy', scoreYatzy(diceValues));
 }
 
 
-function confirmScore(scoreId, scoreValue) {
-    // If using full IDs as keys in gameState.selectedScores or related logic
-    if (scoreValue > 0 && gameState.selectedScores[scoreId] === undefined) {
-        gameState.selectedScores[scoreId] = scoreValue; // Use the full ID as the key
-        
-        var scoreElement = document.getElementById(scoreId);
-        scoreElement.classList.remove('score-possible');
-        scoreElement.classList.add('score-confirmed');
+function updateSingleScore(category, score) {
+    const elementId = `${category}-value`;
+    const scoreElement = document.getElementById(elementId);
 
-        // Additional logic as needed, e.g., clearing other potential scores
-        clearPotentialScores();
-        nextRound(); // Proceed to the next round
+    if (!scoreElement.classList.contains('score-confirmed')) {
+        scoreElement.textContent = score > 0 ? score : '0'; // Show '0' if score condition is not met
+        scoreElement.classList.add('score-possible');
     }
 }
 
-function updateConfirmedScores() {
-    Object.keys(gameState.selectedScores).forEach(function(scoreType) {
-        var scoreValue = gameState.selectedScores[scoreType];
-        var elementId = scoreType + "-value"; // Construct the element ID, e.g., "ones-value"
-        var scoreElement = document.getElementById(elementId);
-        if (scoreElement) {
-            scoreElement.textContent = scoreValue; // Update the score display
-            scoreElement.classList.remove('score-possible');
-            scoreElement.classList.add('score-confirmed');
-        }
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.grid div[id$="-value"]').forEach(function(element) {
+        element.addEventListener('click', function() {
+            if (!gameState.gameStarted || this.classList.contains('score-confirmed')) {
+                return; // Do not interact if the game hasn't started or score is confirmed
+            }
+
+            const scoreValue = parseInt(this.textContent, 10);
+            // Allow confirming a score of 0
+            if ((this.classList.contains('score-possible') && this.classList.contains('clickable')) || (scoreValue === 0 && this.classList.contains('clickable'))) {
+                this.classList.add('score-confirmed');
+                this.style.fontWeight = 'bold'; // Make it bold
+                this.classList.remove('score-possible');
+
+                // Mark the score as selected within gameState
+                const scoreType = this.id.replace('-value', '');
+                gameState.selectedScores[scoreType] = scoreValue;
+
+                nextRound(); // Proceed to the next round
+            }
+        });
     });
+});
 
-    // Clear potential scores after a selection is made
-    clearPotentialScores();
-}
 
-function clearPotentialScores() {
-    document.querySelectorAll('.score-possible').forEach(function(element) {
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.score-field.clickable').forEach(function(element) {
+        element.addEventListener('click', function() {
+            // Ensure the game has started and the score hasn't been confirmed
+            if (!gameState.gameStarted || this.classList.contains('score-confirmed')) {
+                return;
+            }
+
+            // Confirm the score logic
+            const scoreValue = parseInt(this.textContent, 10);
+            if (this.classList.contains('score-possible') || scoreValue >= 0) { // Allowing score of 0 to be confirmed
+                this.classList.add('score-confirmed');
+                this.style.fontWeight = 'bold'; // Visual feedback for confirmed score
+                
+                const scoreType = this.id.replace('-value', '');
+                gameState.selectedScores[scoreType] = scoreValue;
+
+                updateNonClickableScores(); // Recalculate sums, bonuses, etc.
+                nextRound();
+            }
+        });
+    });
+});
+
+// Function to clear all possible scores
+function clearAllPossibleScores() {
+    const scoreElements = document.querySelectorAll('.grid div[id$="-value"]');
+    Array.from(scoreElements).forEach(function(element) {
+        // Skip elements that have been confirmed
         if (!element.classList.contains('score-confirmed')) {
-            element.textContent = ''; // Clear non-confirmed scores
+            element.textContent = '0'; // Reset to '0' only if not confirmed
             element.classList.remove('score-possible');
         }
     });
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    setupScoreSelection();
-});
+function updateNonClickableScores() {
+    // Calculate the sum of the upper section scores
+    const upperSectionCategories = ['ones', 'twos', 'threes', 'fours', 'fives', 'sixes'];
+    let upperSectionSum = 0;
+    upperSectionCategories.forEach(category => {
+        upperSectionSum += gameState.selectedScores[category] || 0;
+    });
+    document.getElementById('sum-value').textContent = upperSectionSum;
+
+    // Calculate and update the bonus
+    const bonus = upperSectionSum >= 63 ? 50 : 0;
+    document.getElementById('bonus-value').textContent = bonus;
+
+    // Update the total top score
+    const totalTop = upperSectionSum + bonus;
+    document.getElementById('total-top-value').textContent = totalTop;
+
+    // Calculate the total bottom score from the lower section categories
+    const lowerSectionCategories = ['three-kind', 'four-kind', 'full-house', 'small-straight', 'large-straight', 'chance', 'yatzy'];
+    let totalBottom = 0;
+    lowerSectionCategories.forEach(category => {
+        totalBottom += gameState.selectedScores[category] || 0;
+    });
+    document.getElementById('total-bottom-value').textContent = totalBottom;
+
+    // Calculate and update the final total score
+    const finalTotal = totalTop + totalBottom;
+    document.getElementById('final-total-value').textContent = finalTotal;
+}
+
+
+function nextRound() {
+    gameState.rollCount = 0;
+    gameState.diceValues = [1, 1, 1, 1, 1]; // Reset dice for the new round
+    gameState.keep = [false, false, false, false, false]; // Reset keep states
+    gameState.gameStarted = false; // Indicate that a new round has started, waiting for the first roll
+    document.getElementById('roll-dice').disabled = false; // Re-enable the roll button
+    clearAllPossibleScores(); // Adjusted to not clear confirmed scores
+    updateNonClickableScores(); // Calculate and display non-clickable scores based on confirmed scores
+    updateGameDisplay(); // Reflect the changes in the UI
+    // updateScoresAfterRoll is not called immediately; wait for the first dice roll of the new round
+}
+
 
