@@ -4,7 +4,7 @@ window.gameState = {
     keep: [false, false, false, false, false],
     currentRound: 1,
     selectedScores: {}, // Added to track confirmed scores
-    gameStarted: false
+    roundStarted: false
 };
 
 // Roll all dice, respecting the keep state
@@ -14,7 +14,7 @@ function rollAllDice() {
             gameState.keep[index] ? value : rollDice()
         );
         gameState.rollCount++;
-        gameState.gameStarted = true; 
+        gameState.roundStarted = true; 
         updateGameDisplay();
         updateScoresAfterRoll(); // Defined in yatzy_engine.js
     }
@@ -43,8 +43,21 @@ function updateGameDisplay() {
         diceElements[index].classList.toggle('selected', kept);
     });
 
-    // Log current roll and dice values for debugging
-    console.log("Roll", gameState.rollCount, ":", gameState.diceValues, "Keep states:", gameState.keep);
+    
+    if(gameEnd()) {
+        document.getElementById('roll-dice').disabled = true;
+    } else {
+        console.log("Round", gameState.currentRound);
+        console.log("Roll", gameState.rollCount, ":", gameState.diceValues, "Keep states:", gameState.keep);
+    }
+}
+
+function gameEnd() {
+    if(gameState.currentRound === 3) { // Game has ended
+        return true;
+    } 
+    return false;
+    
 }
 
 document.addEventListener('DOMContentLoaded', function() {

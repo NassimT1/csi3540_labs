@@ -6,8 +6,8 @@ function countDice(diceValues) {
 }
 
 function scoreOfAKind(diceValues, kind) {
-    var counts = countDice(diceValues);
-    for (var num in counts) {
+    let counts = countDice(diceValues);
+    for (let num in counts) {
         if (counts[num] >= kind) {
             return diceValues.reduce(function(acc, cur) {
                 return acc + cur;
@@ -18,10 +18,10 @@ function scoreOfAKind(diceValues, kind) {
 }
 
 function scoreFullHouse(diceValues) {
-    var counts = countDice(diceValues);
-    var hasThree = false;
-    var hasTwo = false;
-    for (var num in counts) {
+    let counts = countDice(diceValues);
+    let hasThree = false;
+    let hasTwo = false;
+    for (let num in counts) {
         if (counts[num] === 3) hasThree = true;
         if (counts[num] === 2) hasTwo = true;
     }
@@ -29,8 +29,8 @@ function scoreFullHouse(diceValues) {
 }
 
 function scoreSmallStraight(diceValues) {
-    var uniqueValues = Array.from(new Set(diceValues)).sort();
-    var straights = [
+    let uniqueValues = Array.from(new Set(diceValues)).sort();
+    let straights = [
         [1, 2, 3, 4],
         [2, 3, 4, 5],
         [3, 4, 5, 6]
@@ -39,7 +39,7 @@ function scoreSmallStraight(diceValues) {
 }
 
 function scoreLargeStraight(diceValues) {
-    var uniqueValues = Array.from(new Set(diceValues)).sort().join('');
+    let uniqueValues = Array.from(new Set(diceValues)).sort().join('');
     return uniqueValues === '12345' || uniqueValues === '23456' ? 40 : 0;
 }
 
@@ -60,7 +60,7 @@ function scoreUpperSection(diceValues, number) {
 function updateScoresAfterRoll() {
     const diceValues = gameState.diceValues;
 
-    if (!gameState.gameStarted || gameState.rollCount === 0) {
+    if (!gameState.roundStarted || gameState.rollCount === 0) {
         // Do not calculate or update scores before the first roll
         return;
     }
@@ -93,7 +93,7 @@ function updateSingleScore(category, score) {
 document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.grid div[id$="-value"]').forEach(function(element) {
         element.addEventListener('click', function() {
-            if (!gameState.gameStarted || this.classList.contains('score-confirmed')) {
+            if (!gameState.roundStarted || this.classList.contains('score-confirmed')) {
                 return; // Do not interact if the game hasn't started or score is confirmed
             }
 
@@ -114,13 +114,11 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-
-
 document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.score-field.clickable').forEach(function(element) {
         element.addEventListener('click', function() {
             // Ensure the game has started and the score hasn't been confirmed
-            if (!gameState.gameStarted || this.classList.contains('score-confirmed')) {
+            if (!gameState.roundStarted || this.classList.contains('score-confirmed')) {
                 return;
             }
 
@@ -180,6 +178,9 @@ function updateNonClickableScores() {
     // Calculate and update the final total score
     const finalTotal = totalTop + totalBottom;
     document.getElementById('final-total-value').textContent = finalTotal;
+    if(gameEnd()) {
+        console.log("Game over. Your final score is: ", finalTotal, " points");
+    }
 }
 
 
@@ -187,12 +188,12 @@ function nextRound() {
     gameState.rollCount = 0;
     gameState.diceValues = [1, 1, 1, 1, 1]; // Reset dice for the new round
     gameState.keep = [false, false, false, false, false]; // Reset keep states
-    gameState.gameStarted = false; // Indicate that a new round has started, waiting for the first roll
+    gameState.roundStarted = false; // Indicate that a new round has started, waiting for the first roll
+    gameState.currentRound += 1; // Add the current round 
     document.getElementById('roll-dice').disabled = false; // Re-enable the roll button
     clearAllPossibleScores(); // Adjusted to not clear confirmed scores
     updateNonClickableScores(); // Calculate and display non-clickable scores based on confirmed scores
     updateGameDisplay(); // Reflect the changes in the UI
-    // updateScoresAfterRoll is not called immediately; wait for the first dice roll of the new round
 }
 
 
