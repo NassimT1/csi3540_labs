@@ -12,6 +12,8 @@
 <body>
     <div class="dice-container" id="dice-container"></div>
     <button type="button" class="roll-button" id="roll-dice">Roll Dice</button>
+    <button type="button" class="startOverButton-main" id="startOverButton">Start Over</button>
+
 
     <div class="score-sheet">
         <div class="grid top-scores">
@@ -42,5 +44,13 @@
             <div id="final-total-value" class="non-clickable">0</div>
         </div>
     </div>
+    <div id="gameOverModal" class="modal">
+        <div class="modal-content">
+          <span class="close-button">&times;</span>
+          <p id="gameOverMessage"></p>
+          <!-- Start Over Button -->
+          <button id="startOverButton" class="gameOver">Start Over</button>
+        </div>
+      </div>
 </body>
 </html>

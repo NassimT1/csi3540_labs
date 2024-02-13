@@ -2,7 +2,7 @@ window.gameState = {
     rollCount: 0,
     diceValues: [1, 1, 1, 1, 1], // Initialize with a default value for each die
     keep: [false, false, false, false, false],
-    currentRound: 1,
+    currentRound: 0,
     selectedScores: {}, // Added to track confirmed scores
     roundStarted: false
 };
@@ -53,7 +53,7 @@ function updateGameDisplay() {
 }
 
 function gameEnd() {
-    if(gameState.currentRound === 3) { // Game has ended
+    if(gameState.currentRound === 13) { // Game has ended
         return true;
     } 
     return false;
@@ -61,8 +61,13 @@ function gameEnd() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Define gameState globally within this file to track the game state
-    
+    // Start over if the button is clicked
+    let startOverButton = document.getElementById("startOverButton");
+    startOverButton.onclick = function() {
+        // Refresh the page to start a new game
+        window.location.reload();
+    };
+
 
     // Attach event listeners
     document.getElementById('roll-dice').addEventListener('click', rollAllDice);

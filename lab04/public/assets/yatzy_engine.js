@@ -180,7 +180,37 @@ function updateNonClickableScores() {
     document.getElementById('final-total-value').textContent = finalTotal;
     if(gameEnd()) {
         console.log("Game over. Your final score is: ", finalTotal, " points");
+        
+        // Set the game over message
+        document.getElementById("gameOverMessage").textContent = "Game over. Your final score is: " + finalTotal + " points";
+        
+        // Display the modal
+        let modal = document.getElementById("gameOverModal");
+        modal.style.display = "block";
+        
+        // Get the <span> element that closes the modal
+        let closeButton = document.querySelector(".close-button");
+        
+        // When the user clicks on <span> (x), close the modal
+        closeButton.onclick = function() {
+            modal.style.display = "none";
+        };
+        
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        };
+    
+        // Get the "Start Over" button and add a click event listener
+        let startOverButton = document.getElementById("startOverButton");
+        startOverButton.onclick = function() {
+            // Refresh the page to start a new game
+            window.location.reload();
+        };
     }
+    
 }
 
 
