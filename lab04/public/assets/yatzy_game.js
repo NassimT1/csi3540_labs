@@ -16,7 +16,7 @@ function rollAllDice() {
         gameState.rollCount++;
         gameState.roundStarted = true; 
         updateGameDisplay();
-        updateScoresAfterRoll(); // Defined in yatzy_engine.js
+        updateScoresAfterRoll(); // 
     }
     
     if (gameState.rollCount === 3) {
@@ -60,16 +60,18 @@ function gameEnd() {
     
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Start over if the button is clicked
-    let startOverButton = document.getElementById("startOverButton");
+function startOver(name) {
+    let startOverButton = document.getElementById(name);
     startOverButton.onclick = function() {
         // Refresh the page to start a new game
         window.location.reload();
     };
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    startOver("startOverButton");
 
 
-    // Attach event listeners
     document.getElementById('roll-dice').addEventListener('click', rollAllDice);
 
     document.getElementById('dice-container').addEventListener('click', function(event) {
@@ -80,7 +82,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Ensure updateScoresAfterRoll is called initially if needed
     updateGameDisplay();
     updateScoresAfterRoll(); // Initial score update
 });
