@@ -1,3 +1,5 @@
+// Generated score functions using AI for simplicity
+
 function countDice(diceValues) {
     return diceValues.reduce(function(acc, value) {
         acc[value] = (acc[value] || 0) + 1;
@@ -61,7 +63,6 @@ function updateScoresAfterRoll() {
     const diceValues = gameState.diceValues;
 
     if (!gameState.roundStarted || gameState.rollCount === 0) {
-        // Do not calculate or update scores before the first roll
         return;
     }
 
@@ -108,31 +109,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const scoreType = this.id.replace('-value', '');
                 gameState.selectedScores[scoreType] = scoreValue;
 
-                nextRound(); // Proceed to the next round
-            }
-        });
-    });
-});
-
-document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.score-field.clickable').forEach(function(element) {
-        element.addEventListener('click', function() {
-            // Ensure the game has started and the score hasn't been confirmed
-            if (!gameState.roundStarted || this.classList.contains('score-confirmed')) {
-                return;
-            }
-
-            // Confirm the score logic
-            const scoreValue = parseInt(this.textContent, 10);
-            if (this.classList.contains('score-possible') || scoreValue >= 0) { // Allowing score of 0 to be confirmed
-                this.classList.add('score-confirmed');
-                this.style.fontWeight = 'bold'; // Visual feedback for confirmed score
-                
-                const scoreType = this.id.replace('-value', '');
-                gameState.selectedScores[scoreType] = scoreValue;
-
-                updateNonClickableScores(); // Recalculate sums, bonuses, etc.
-                nextRound();
+                nextRound(); 
             }
         });
     });
@@ -204,13 +181,8 @@ function updateNonClickableScores() {
         };
     
         // Get the "Start Over" button and add a click event listener
-        let startOverButton = document.getElementById("startOverButton");
-        startOverButton.onclick = function() {
-            // Refresh the page to start a new game
-            window.location.reload();
-        };
+        startOver("finalStartOverButton");   
     }
-    
 }
 
 
